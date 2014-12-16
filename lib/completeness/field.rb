@@ -14,8 +14,22 @@ module Completeness
       !!options[:required]
     end
 
+    def get_attribute_value(object)
+      if name.is_a?(Array) && get_attribute_type(object) == :json
+        h = object.send(name[0])
+        name[1..-1].inject(h) { |v, n| v[n.to_s] }
+      else
+        object.send(name)
+      end
+    end
+
+    def get_attribute_type(object)
+      n = name.is_a?(Array) ? name[0] : name
+      object.class.columns_hash[n.to_s].type
+    end
+
     def completed?(object)
-      completeness_check.call(object, object.send(name))
+      completeness_check.call(object, get_attribute_value(object))
     end
 
     def weight

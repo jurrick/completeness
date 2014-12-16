@@ -6,7 +6,7 @@ module Completeness
     end
 
     def field(name, options = {})
-      spec[name] = Field.new(spec, name, default_options.merge(options))
+      spec[attribute_fullname(name)] = Field.new(spec, name, default_options.merge(options))
     end
 
     def spec
@@ -15,5 +15,13 @@ module Completeness
 
     private
     attr_reader :default_options
+
+    def attribute_fullname(name)
+      if name.is_a?(Array)
+        name[0].to_s + name[1..-1].inject('') { |str, el| "#{str}[#{el}]" }
+      else
+        name
+      end
+    end
   end
 end
